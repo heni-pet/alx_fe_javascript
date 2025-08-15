@@ -153,7 +153,62 @@ function importQuotes() {
   };
   reader.readAsText(file);
 }
+// --- Server Sync Simulation ---
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Mock API
 
-// Initial Setup
+async function fetchServerQuotes() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const serverData = await response.json();
+    return serverData.slice(0, 5).map(item => ({
+      text: item.title,
+      category: "Server"
+    }));
+  } catch(err) {
+    console.error('Server fetch failed:', err);
+    return [];
+  }
+}
+
+async function syncWithServer() {
+  const serverQuotes = await fetchServerQuotes();
+  let newQuotes = 0;
+
+  serverQuotes.forEach(sq => {
+    const exists = quotes.some(lq => lq.text === sq.text && lq.category === sq.category);
+    if(!exists) {
+      quotes.push(sq);
+      newQuotes++;
+    }
+  });
+
+  if(newQuotes > 0) {
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+    showNotification(`${newQuotes} new quotes synced from server.`);
+  }
+}
+
+// Periodic sync every 30 seconds
+setInterval(syncWithServer, 30000);
+
+// --- Notification System ---
+function showNotification(message) {
+  let notification = document.getElementById('notification');
+  if(!notification) {
+    notification = document.createElement('div');
+    notification.id = 'notification';
+    document.body.appendChild(notification);
+  }
+  notification.textContent = message;
+  notification.style.display = 'block';
+  setTimeout(() => { notification.style.display = 'none'; }, 5000);
+}
+
+// --- Initial Setup ---
 populateCategories();
 filterQuotes();
+syncWithServer();
+
+
