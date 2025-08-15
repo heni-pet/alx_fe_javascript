@@ -156,7 +156,7 @@ function importQuotes() {
 // --- Server Sync Simulation ---
 const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Mock API
 
-async function fetchServerQuotes() {
+async function fetchQuotesfromserver() {
   try {
     const response = await fetch(SERVER_URL);
     const serverData = await response.json();
@@ -171,7 +171,7 @@ async function fetchServerQuotes() {
 }
 
 async function syncWithServer() {
-  const serverQuotes = await fetchServerQuotes();
+  const serverQuotes = await fetchQuotesfromserver();
   let newQuotes = 0;
 
   serverQuotes.forEach(sq => {
