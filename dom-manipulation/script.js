@@ -9,6 +9,26 @@ let quotes = [
 if(localStorage.getItem('quotes')) {
   quotes = JSON.parse(localStorage.getItem('quotes'));
 }
+// Save last viewed quote when a quote is clicked
+document.addEventListener("DOMContentLoaded", () => {
+  const quoteDisplay = document.getElementById("quoteDisplay");
+
+  // Delegate click event to quotes
+  quoteDisplay.addEventListener("click", (e) => {
+    if (e.target.classList.contains("quote")) {
+      const quoteText = e.target.textContent;
+      sessionStorage.setItem("lastViewedQuote", quoteText);
+      showNotification("Last viewed quote saved!");
+    }
+  });
+
+  // Show last viewed quote if exists
+  const lastQuote = sessionStorage.getItem("lastViewedQuote");
+  if (lastQuote) {
+    showNotification("Last viewed quote: " + lastQuote);
+  }
+});
+
 // --- Server Sync Simulation ---
 const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Mock API
 
