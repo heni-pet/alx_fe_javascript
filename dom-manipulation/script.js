@@ -176,7 +176,7 @@ async function syncQuotes() {
     saveQuotes();
     populateCategories();
     filterQuotes();
-    showNotification(`${newQuotes} new quotes synced from server.`);
+    showNotification("Quotes synced with server!");
   }
 }
 
