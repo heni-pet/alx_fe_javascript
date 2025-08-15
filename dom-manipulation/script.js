@@ -12,6 +12,25 @@ if(localStorage.getItem('quotes')) {
 // Save last viewed quote when a quote is clicked
 document.addEventListener("DOMContentLoaded", () => {
   const quoteDisplay = document.getElementById("quoteDisplay");
+  function showRandomQuote() {
+  if (quotes.length === 0) return;
+
+  // Pick a random quote
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  const q = quotes[randomIndex];
+
+  const display = document.getElementById("quoteDisplay");
+  display.innerHTML = ''; // Clear previous
+
+  const div = document.createElement('div');
+  div.className = 'quote';
+  div.textContent = `"${q.text}" — ${q.category}`;
+  display.appendChild(div);
+
+  // Save to sessionStorage as last viewed quote
+  sessionStorage.setItem("lastViewedQuote", div.textContent);
+}
+
 
   // Delegate click event to quotes
   quoteDisplay.addEventListener("click", (e) => {
