@@ -51,6 +51,27 @@ function displayQuotes(filteredQuotes = quotes) {
     display.appendChild(div);
   });
 }
+// Display Quotes (shuffled randomly)
+function displayQuotes(filteredQuotes = quotes) {
+  const display = document.getElementById('quoteDisplay');
+  display.innerHTML = '';
+
+  if(filteredQuotes.length === 0) {
+    display.innerHTML = '<p>No quotes found for this category.</p>';
+    return;
+  }
+
+  // Shuffle the quotes array randomly
+  const shuffledQuotes = filteredQuotes.sort(() => Math.random() - 0.5);
+
+  shuffledQuotes.forEach(q => {
+    const div = document.createElement('div');
+    div.className = 'quote';
+    div.textContent = `"${q.text}" — ${q.category}`;
+    display.appendChild(div);
+  });
+}
+
 
 // Filter Quotes Based on Category
 function filterQuotes() {
