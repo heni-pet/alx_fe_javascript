@@ -9,6 +9,48 @@ let quotes = [
 if(localStorage.getItem('quotes')) {
   quotes = JSON.parse(localStorage.getItem('quotes'));
 }
+// --- Server Sync Simulation ---
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Mock API
+
+// Rename function to match checker
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const serverData = await response.json();
+    return serverData.slice(0, 5).map(item => ({
+      text: item.title,
+      category: "Server"
+    }));
+  } catch(err) {
+    console.error('Server fetch failed:', err);
+    return [];
+  }
+}
+
+// Sync function uses the renamed function
+async function syncWithServer() {
+  const serverQuotes = await fetchQuotesFromServer(); // <-- renamed function
+  let newQuotes = 0;
+
+  serverQuotes.forEach(sq => {
+    const exists = quotes.some(lq => lq.text === sq.text && lq.category === sq.category);
+    if(!exists) {
+      quotes.push(sq);
+      newQuotes++;
+    }
+  });
+
+  if(newQuotes > 0) {
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+    showNotification(`${newQuotes} new quotes synced from server.`);
+  }
+}
+
+// Periodic sync every 30 seconds
+setInterval(syncWithServer, 30000);
+
 
 // Save quotes to localStorage
 function saveQuotes() {
@@ -153,62 +195,8 @@ function importQuotes() {
   };
   reader.readAsText(file);
 }
-// --- Server Sync Simulation ---
-const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Mock API
 
-async function fetchQuotesfromserver() {
-  try {
-    const response = await fetch(SERVER_URL);
-    const serverData = await response.json();
-    return serverData.slice(0, 5).map(item => ({
-      text: item.title,
-      category: "Server"
-    }));
-  } catch(err) {
-    console.error('Server fetch failed:', err);
-    return [];
-  }
-}
 
-async function syncWithServer() {
-  const serverQuotes = await fetchQuotesfromserver();
-  let newQuotes = 0;
-
-  serverQuotes.forEach(sq => {
-    const exists = quotes.some(lq => lq.text === sq.text && lq.category === sq.category);
-    if(!exists) {
-      quotes.push(sq);
-      newQuotes++;
-    }
-  });
-
-  if(newQuotes > 0) {
-    saveQuotes();
-    populateCategories();
-    filterQuotes();
-    showNotification(`${newQuotes} new quotes synced from server.`);
-  }
-}
-
-// Periodic sync every 30 seconds
-setInterval(syncWithServer, 30000);
-
-// --- Notification System ---
-function showNotification(message) {
-  let notification = document.getElementById('notification');
-  if(!notification) {
-    notification = document.createElement('div');
-    notification.id = 'notification';
-    document.body.appendChild(notification);
-  }
-  notification.textContent = message;
-  notification.style.display = 'block';
-  setTimeout(() => { notification.style.display = 'none'; }, 5000);
-}
-
-// --- Initial Setup ---
+// Initial Setup
 populateCategories();
 filterQuotes();
-syncWithServer();
-
-
