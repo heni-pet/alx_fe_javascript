@@ -159,6 +159,27 @@ function exportQuotes() {
   a.click();
   URL.revokeObjectURL(url);
 }
+async function syncQuotes() {
+  // 1. Fetch server quotes
+  const serverQuotes = await fetchQuotesFromServer();
+  let newQuotes = 0;
+
+  serverQuotes.forEach(sq => {
+    const exists = quotes.some(lq => lq.text === sq.text && lq.category === sq.category);
+    if(!exists) {
+      quotes.push(sq);
+      newQuotes++;
+    }
+  });
+
+  if(newQuotes > 0) {
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+    showNotification(`${newQuotes} new quotes synced from server.`);
+  }
+}
+
 async function sendQuotesToServer() {
   try {
     const response = await fetch(SERVER_URL, {
